@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api-redis-chart.fullname" . }}-api
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "api-redis-chart.name" . }}-api
+  template:
+    metadata:
+      labels:
+        app: {{ include "api-redis-chart.name" . }}-api
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          env:
+            - name: PORT
+              value: "3000"
+            - name: REDIS_HOST
+              value: {{ include "api-redis-chart.fullname" . }}-redis
+            - name: REDIS_PORT
+              value: "6379"
+          ports:
+            - containerPort: 3000
